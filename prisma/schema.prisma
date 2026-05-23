@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Post {
+  id                 String    @id @default(cuid())
+  topic              String
+  heading            String    @default("")
+  content            String
+  imagePath          String?
+  imagePrompt        String?
+  suggestedImageText String?
+  hashtags           String    @default("[]")
+  logoKey            String?
+  logoVariant        String?
+  status             String    @default("DRAFT")
+  linkedinPostId     String?
+  publishAs          String    @default("PERSONAL")
+  scheduledAt        DateTime?
+  publishedAt        DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+}
+
+model Solution {
+  id        String   @id @default(cuid())
+  name      String
+  trademark String   @default("")
+  logoKey   String   @default("")
+  active    Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Topic {
+  id        String   @id @default(cuid())
+  title     String
+  value     String
+  category  String
+  logoKey   String   @default("")
+  hashtags  String   @default("[]")
+  isDefault Boolean  @default(false)
+  active    Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Settings {
+  id                   String   @id @default("singleton")
+  anthropicApiKey      String   @default("")
+  openaiApiKey         String   @default("")
+  linkedinClientId     String   @default("")
+  linkedinClientSecret String   @default("")
+  linkedinAccessToken  String   @default("")
+  linkedinPersonUrn    String   @default("")
+  linkedinOrgId        String   @default("")
+  companyName          String   @default("XGRC Software")
+  companyLinkedInUrl   String   @default("")
+  defaultPublishAs     String   @default("PERSONAL")
+  brandData            String   @default("{}")
+  writerConfig         String   @default("{}")
+  updatedAt            DateTime @updatedAt
+}
