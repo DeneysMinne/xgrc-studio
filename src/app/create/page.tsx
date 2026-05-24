@@ -79,30 +79,28 @@ export default function CreatePage() {
 
       <StepIndicator currentStep={state.step} steps={STEPS} />
 
-      <div className="mt-8 overflow-hidden">
+      <div className="mt-8">
         <AnimatePresence mode="wait" custom={dirRef.current}>
-          <motion.div
-            key={state.step}
-            custom={dirRef.current}
-            variants={stepVariants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{ duration: 0.22, ease: 'easeInOut' }}
-          >
-            {state.step === 1 && (
+          {state.step === 1 && (
+            <motion.div key="step-1" custom={dirRef.current} variants={stepVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.2, ease: 'easeInOut' }}>
               <TopicSelector state={state} onUpdate={update} onNext={() => goToStep(2)} />
-            )}
-            {state.step === 2 && (
+            </motion.div>
+          )}
+          {state.step === 2 && (
+            <motion.div key="step-2" custom={dirRef.current} variants={stepVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.2, ease: 'easeInOut' }}>
               <StreamingEditor state={state} onUpdate={update} onNext={() => goToStep(3)} />
-            )}
-            {state.step === 3 && (
+            </motion.div>
+          )}
+          {state.step === 3 && (
+            <motion.div key="step-3" custom={dirRef.current} variants={stepVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.2, ease: 'easeInOut' }}>
               <ReviewEdit state={state} onUpdate={update} onBack={() => goToStep(2)} onNext={() => goToStep(4)} />
-            )}
-            {state.step === 4 && (
+            </motion.div>
+          )}
+          {state.step === 4 && (
+            <motion.div key="step-4" custom={dirRef.current} variants={stepVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.2, ease: 'easeInOut' }}>
               <PublishPanel state={state} onUpdate={update} onBack={() => goToStep(3)} onReset={reset} />
-            )}
-          </motion.div>
+            </motion.div>
+          )}
         </AnimatePresence>
       </div>
     </div>
