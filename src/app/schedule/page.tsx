@@ -2,20 +2,13 @@
 
 import { useState, useEffect } from 'react'
 import { Post } from '@/types'
-import { Calendar, List, Clock, X, Loader2 } from 'lucide-react'
+import { Calendar, List, Clock, X, Loader2, CalendarX } from 'lucide-react'
 import { cn, formatDate } from '@/lib/utils'
 import { toast } from 'sonner'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
-  format,
-  startOfMonth,
-  endOfMonth,
-  eachDayOfInterval,
-  isSameDay,
-  isToday,
-  addMonths,
-  subMonths,
-  startOfWeek,
-  endOfWeek,
+  format, startOfMonth, endOfMonth, eachDayOfInterval,
+  isSameDay, isToday, addMonths, subMonths, startOfWeek, endOfWeek,
 } from 'date-fns'
 
 export default function SchedulePage() {
@@ -77,19 +70,23 @@ export default function SchedulePage() {
     <div className="max-w-5xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-[#e6edf3]">Schedule</h1>
-          <p className="text-[#8b949e] mt-1">{posts.length} scheduled posts</p>
+          <h1 className="text-2xl font-bold text-ink">Schedule</h1>
+          <p className="text-dim mt-1">{posts.length} scheduled {posts.length === 1 ? 'post' : 'posts'}</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-1 p-1 card rounded-lg" role="group" aria-label="View mode">
           <button
             onClick={() => setViewMode('calendar')}
-            className={cn('p-2 rounded-md', viewMode === 'calendar' ? 'bg-[#0066ff] text-white' : 'bg-[#1a1a2e] text-[#8b949e] hover:text-[#e6edf3]')}
+            aria-pressed={viewMode === 'calendar'}
+            aria-label="Calendar view"
+            className={cn('p-2 rounded-md transition-colors', viewMode === 'calendar' ? 'bg-accent text-white' : 'text-dim hover:text-ink')}
           >
             <Calendar size={16} />
           </button>
           <button
             onClick={() => setViewMode('list')}
-            className={cn('p-2 rounded-md', viewMode === 'list' ? 'bg-[#0066ff] text-white' : 'bg-[#1a1a2e] text-[#8b949e] hover:text-[#e6edf3]')}
+            aria-pressed={viewMode === 'list'}
+            aria-label="List view"
+            className={cn('p-2 rounded-md transition-colors', viewMode === 'list' ? 'bg-accent text-white' : 'text-dim hover:text-ink')}
           >
             <List size={16} />
           </button>
@@ -97,23 +94,48 @@ export default function SchedulePage() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center h-64 text-[#8b949e]">Loading...</div>
-      ) : posts.length === 0 ? (
-        <div className="bg-[#1a1a2e] border border-[#30363d] rounded-lg p-12 text-center">
-          <Clock size={32} className="mx-auto text-[#30363d] mb-4" />
-          <p className="text-[#8b949e]">No scheduled posts. Create a post and schedule it for a future date.</p>
+        <div className="card p-12 flex items-center justify-center" aria-busy="true" aria-label="Loading scheduled posts">
+          <Loader2 size={24} className="animate-spin text-dim" />
         </div>
-      ) : viewMode === 'calendar' ? (
-        <div className="bg-[#1a1a2e] border border-[#30363d] rounded-lg overflow-hidden">
-          {/* Calendar header */}
-          <div className="flex items-center justify-between px-5 py-3 border-b border-[#30363d]">
-            <button onClick={() => setCurrentMonth(m => subMonths(m, 1))} className="text-[#8b949e] hover:text-[#e6edf3] px-2">&#8249;</button>
-            <span className="text-[#e6edf3] font-semibold">{format(currentMonth, 'MMMM yyyy')}</span>
-            <button onClick={() => setCurrentMonth(m => addMonths(m, 1))} className="text-[#8b949e] hover:text-[#e6edf3] px-2">&#8250;</button>
+      ) : posts.length === 0 ? (
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="card p-16 text-center flex flex-col items-center gap-4"
+          role="status"
+        >
+          <div className="w-16 h-16 rounded-full bg-elevated flex items-center justify-center">
+            <CalendarX size={28} className="text-dim" aria-hidden="true" />
           </div>
-          <div className="grid grid-cols-7">
+          <div>
+            <p className="text-ink font-medium">Nothing scheduled</p>
+            <p className="text-dim text-sm mt-1">Create a post and schedule it for a future date.</p>
+          </div>
+          <a href="/create" className="btn-primary text-sm">Create a post</a>
+        </motion.div>
+      ) : viewMode === 'calendar' ? (
+        <div className="card overflow-hidden">
+          {/* Calendar header */}
+          <div className="flex items-center justify-between px-5 py-3 border-b border-edge">
+            <button
+              onClick={() => setCurrentMonth(m => subMonths(m, 1))}
+              aria-label="Previous month"
+              className="text-dim hover:text-ink px-2 py-1 rounded transition-colors"
+            >
+              &#8249;
+            </button>
+            <span className="text-ink font-semibold" aria-live="polite">{format(currentMonth, 'MMMM yyyy')}</span>
+            <button
+              onClick={() => setCurrentMonth(m => addMonths(m, 1))}
+              aria-label="Next month"
+              className="text-dim hover:text-ink px-2 py-1 rounded transition-colors"
+            >
+              &#8250;
+            </button>
+          </div>
+          <div className="grid grid-cols-7" role="grid" aria-label="Calendar">
             {['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d => (
-              <div key={d} className="text-center text-xs text-[#8b949e] py-2 border-b border-[#30363d]">{d}</div>
+              <div key={d} className="text-center text-xs text-dim py-2 border-b border-edge" role="columnheader">{d}</div>
             ))}
             {calendarDays.map(day => {
               const dayPosts = postsOnDay(day)
@@ -121,13 +143,18 @@ export default function SchedulePage() {
               return (
                 <div
                   key={day.toISOString()}
+                  role="gridcell"
+                  aria-label={format(day, 'MMMM d, yyyy')}
                   className={cn(
-                    'min-h-[80px] p-1 border-b border-r border-[#30363d] last:border-r-0',
+                    'min-h-[80px] p-1 border-b border-r border-edge last:border-r-0',
                     !isCurrentMonth && 'opacity-40',
-                    isToday(day) && 'bg-[#0066ff]/10'
+                    isToday(day) && 'bg-accent/10'
                   )}
                 >
-                  <div className={cn('text-xs font-medium mb-1 w-5 h-5 flex items-center justify-center rounded-full', isToday(day) ? 'bg-[#0066ff] text-white' : 'text-[#8b949e]')}>
+                  <div className={cn(
+                    'text-xs font-medium mb-1 w-5 h-5 flex items-center justify-center rounded-full',
+                    isToday(day) ? 'bg-accent text-white' : 'text-dim'
+                  )}>
                     {format(day, 'd')}
                   </div>
                   <div className="space-y-0.5">
@@ -135,7 +162,8 @@ export default function SchedulePage() {
                       <button
                         key={p.id}
                         onClick={() => setSelectedPost(p)}
-                        className="w-full text-left text-xs bg-[#0066ff]/20 text-[#00d4ff] rounded px-1 py-0.5 truncate hover:bg-[#0066ff]/40 transition-colors"
+                        className="w-full text-left text-xs bg-accent/20 text-glow rounded px-1 py-0.5 truncate hover:bg-accent/40 transition-colors"
+                        aria-label={`${p.heading} at ${p.scheduledAt ? format(new Date(p.scheduledAt), 'HH:mm') : ''}`}
                       >
                         {p.scheduledAt ? format(new Date(p.scheduledAt), 'HH:mm') : ''} {p.heading}
                       </button>
@@ -147,78 +175,116 @@ export default function SchedulePage() {
           </div>
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-2" role="list">
           {posts
             .sort((a, b) => new Date(a.scheduledAt!).getTime() - new Date(b.scheduledAt!).getTime())
             .map(post => (
-              <button
+              <motion.button
                 key={post.id}
+                layout
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                role="listitem"
                 onClick={() => setSelectedPost(post)}
-                className="w-full text-left bg-[#1a1a2e] border border-[#30363d] rounded-lg px-4 py-3 hover:border-[#0066ff] transition-colors"
+                className="w-full text-left card px-4 py-3 hover:border-accent transition-colors"
+                aria-label={`${post.heading || 'Untitled'}, scheduled for ${post.scheduledAt ? formatDate(post.scheduledAt) : 'unknown time'}`}
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-[#e6edf3] font-medium text-sm">{post.heading || 'Untitled'}</p>
-                    <p className="text-[#8b949e] text-xs mt-0.5">{post.topic}</p>
+                    <p className="text-ink font-medium text-sm">{post.heading || 'Untitled'}</p>
+                    <p className="text-dim text-xs mt-0.5">{post.topic}</p>
                   </div>
-                  <div className="flex items-center gap-2 text-[#8b949e] text-xs">
-                    <Clock size={12} />
+                  <div className="flex items-center gap-2 text-dim text-xs">
+                    <Clock size={12} aria-hidden="true" />
                     {post.scheduledAt ? formatDate(post.scheduledAt) : '—'}
                   </div>
                 </div>
-              </button>
+              </motion.button>
             ))}
         </div>
       )}
 
-      {/* Side panel for selected post */}
-      {selectedPost && (
-        <div className="fixed inset-0 z-50 flex items-start justify-end bg-black/50" onClick={() => setSelectedPost(null)}>
-          <div className="bg-[#1a1a2e] border-l border-[#30363d] w-[400px] h-full overflow-y-auto p-5 space-y-4" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between">
-              <h3 className="text-[#e6edf3] font-semibold">Scheduled Post</h3>
-              <button onClick={() => setSelectedPost(null)} className="text-[#8b949e] hover:text-[#e6edf3]"><X size={16} /></button>
-            </div>
-
-            <div className="bg-white rounded-lg p-4 text-sm">
-              <p className="font-bold text-gray-900 mb-2">{selectedPost.heading}</p>
-              <p className="text-gray-800 whitespace-pre-wrap text-xs leading-relaxed mb-2">{selectedPost.content.slice(0, 300)}{selectedPost.content.length > 300 ? '...' : ''}</p>
-              {selectedPost.imagePath && <img src={selectedPost.imagePath} alt="" className="w-full rounded" />}
-            </div>
-
-            <div className="text-xs text-[#8b949e] space-y-1">
-              <p>Scheduled: <span className="text-[#e6edf3]">{selectedPost.scheduledAt ? formatDate(selectedPost.scheduledAt) : '—'}</span></p>
-              <p>Publish as: <span className="text-[#e6edf3]">{selectedPost.publishAs}</span></p>
-            </div>
-
-            <div>
-              <label className="block text-xs text-[#8b949e] mb-1">Reschedule to</label>
-              <div className="flex gap-2">
-                <input
-                  type="datetime-local"
-                  value={newDate}
-                  onChange={e => setNewDate(e.target.value)}
-                  className="flex-1 bg-[#0d1117] border border-[#30363d] rounded px-2 py-1.5 text-[#e6edf3] text-xs focus:outline-none focus:border-[#0066ff]"
-                />
+      {/* Side panel */}
+      <AnimatePresence>
+        {selectedPost && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              className="fixed inset-0 z-40 bg-black/50"
+              onClick={() => setSelectedPost(null)}
+              aria-hidden="true"
+            />
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
+              className="fixed right-0 top-0 z-50 bg-surface border-l border-edge w-[400px] h-full overflow-y-auto p-5 space-y-4"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Scheduled post details"
+            >
+              <div className="flex items-center justify-between">
+                <h3 className="text-ink font-semibold">Scheduled Post</h3>
                 <button
-                  onClick={handleReschedule}
-                  disabled={!newDate || rescheduling}
-                  className="px-3 py-1.5 bg-[#0066ff] text-white rounded text-xs disabled:opacity-50"
+                  onClick={() => setSelectedPost(null)}
+                  aria-label="Close panel"
+                  className="text-dim hover:text-ink transition-colors p-1 rounded"
                 >
-                  {rescheduling ? <Loader2 size={12} className="animate-spin" /> : 'Save'}
+                  <X size={16} />
                 </button>
               </div>
-            </div>
 
-            <button
-              onClick={() => handleCancel(selectedPost.id)}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-[#f85149]/20 text-[#f85149] border border-[#f85149]/30 rounded-md text-sm hover:bg-[#f85149]/30"
-            >
-              <X size={14} /> Cancel Schedule
-            </button>
-          </div>
-        </div>
-      )}
+              <div className="bg-white rounded-lg p-4 text-sm">
+                <p className="font-bold text-gray-900 mb-2">{selectedPost.heading}</p>
+                <p className="text-gray-700 whitespace-pre-wrap text-xs leading-relaxed mb-2">
+                  {selectedPost.content.slice(0, 300)}{selectedPost.content.length > 300 ? '...' : ''}
+                </p>
+                {selectedPost.imagePath && (
+                  <img src={selectedPost.imagePath} alt="Post image" className="w-full rounded" />
+                )}
+              </div>
+
+              <div className="text-xs text-dim space-y-1">
+                <p>Scheduled: <span className="text-ink">{selectedPost.scheduledAt ? formatDate(selectedPost.scheduledAt) : '—'}</span></p>
+                <p>Publish as: <span className="text-ink">{selectedPost.publishAs}</span></p>
+              </div>
+
+              <div>
+                <label className="label text-xs" htmlFor="reschedule-date">Reschedule to</label>
+                <div className="flex gap-2">
+                  <input
+                    id="reschedule-date"
+                    type="datetime-local"
+                    value={newDate}
+                    onChange={e => setNewDate(e.target.value)}
+                    className="field flex-1 text-xs py-1.5"
+                  />
+                  <button
+                    onClick={handleReschedule}
+                    disabled={!newDate || rescheduling}
+                    className="btn-primary text-xs px-3 py-1.5"
+                    aria-label="Save new schedule date"
+                  >
+                    {rescheduling ? <Loader2 size={12} className="animate-spin" aria-hidden="true" /> : 'Save'}
+                  </button>
+                </div>
+              </div>
+
+              <button
+                onClick={() => handleCancel(selectedPost.id)}
+                className="btn-danger w-full"
+                aria-label="Cancel schedule and revert to draft"
+              >
+                <X size={14} aria-hidden="true" /> Cancel Schedule
+              </button>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

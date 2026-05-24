@@ -9,6 +9,7 @@ import WriterTab from '@/components/settings/WriterTab'
 import PlatformsTab from '@/components/settings/PlatformsTab'
 import SolutionsTab from '@/components/settings/SolutionsTab'
 import TopicsTab from '@/components/settings/TopicsTab'
+import { SkeletonSettings } from '@/components/ui/Skeleton'
 import { AppSettings } from '@/types'
 import { DEFAULT_BRAND_CONFIG } from '@/lib/brand-config'
 import { DEFAULT_WRITER_CONFIG } from '@/lib/ai-writer'
@@ -38,32 +39,21 @@ function SettingsContent() {
   useEffect(() => {
     fetch('/api/settings')
       .then(r => r.json())
-      .then(data => {
-        setSettings(prev => ({ ...prev, ...data }))
-        setLoading(false)
-      })
+      .then(data => { setSettings(prev => ({ ...prev, ...data })); setLoading(false) })
       .catch(() => setLoading(false))
   }, [])
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-[#8b949e]">Loading settings...</div>
-      </div>
-    )
-  }
 
   const defaultTab = tabParam === 'linkedin' ? 'linkedin' : 'api-keys'
 
   return (
     <div className="max-w-5xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-[#e6edf3]">Settings</h1>
-        <p className="text-[#8b949e] mt-1">Configure API keys, platforms, brand assets, solutions, topics, and writer profile</p>
+        <h1 className="text-2xl font-bold text-ink">Settings</h1>
+        <p className="text-dim mt-1">Configure API keys, platforms, brand assets, solutions, topics, and writer profile</p>
       </div>
 
       <Tabs defaultValue={defaultTab}>
-        <TabsList className="bg-[#1a1a2e] border border-[#30363d] mb-6 flex-wrap h-auto gap-1 p-1">
+        <TabsList className="bg-surface border border-edge mb-6 flex-wrap h-auto gap-1 p-1" aria-label="Settings sections">
           <TabsTrigger value="api-keys">API Keys</TabsTrigger>
           <TabsTrigger value="platforms">Platforms</TabsTrigger>
           <TabsTrigger value="linkedin">LinkedIn</TabsTrigger>
@@ -73,33 +63,33 @@ function SettingsContent() {
           <TabsTrigger value="writer">Writer Profile</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="api-keys">
-          <ApiKeysTab settings={settings} onUpdate={setSettings} />
-        </TabsContent>
-
-        <TabsContent value="platforms">
-          <PlatformsTab />
-        </TabsContent>
-
-        <TabsContent value="linkedin">
-          <LinkedInTab settings={settings} onUpdate={setSettings} />
-        </TabsContent>
-
-        <TabsContent value="brand">
-          <BrandTab settings={settings} onUpdate={setSettings} />
-        </TabsContent>
-
-        <TabsContent value="solutions">
-          <SolutionsTab />
-        </TabsContent>
-
-        <TabsContent value="topics">
-          <TopicsTab />
-        </TabsContent>
-
-        <TabsContent value="writer">
-          <WriterTab settings={settings} onUpdate={setSettings} />
-        </TabsContent>
+        {loading ? (
+          <SkeletonSettings />
+        ) : (
+          <>
+            <TabsContent value="api-keys">
+              <ApiKeysTab settings={settings} onUpdate={setSettings} />
+            </TabsContent>
+            <TabsContent value="platforms">
+              <PlatformsTab />
+            </TabsContent>
+            <TabsContent value="linkedin">
+              <LinkedInTab settings={settings} onUpdate={setSettings} />
+            </TabsContent>
+            <TabsContent value="brand">
+              <BrandTab settings={settings} onUpdate={setSettings} />
+            </TabsContent>
+            <TabsContent value="solutions">
+              <SolutionsTab />
+            </TabsContent>
+            <TabsContent value="topics">
+              <TopicsTab />
+            </TabsContent>
+            <TabsContent value="writer">
+              <WriterTab settings={settings} onUpdate={setSettings} />
+            </TabsContent>
+          </>
+        )}
       </Tabs>
     </div>
   )
@@ -107,7 +97,15 @@ function SettingsContent() {
 
 export default function SettingsPage() {
   return (
-    <Suspense fallback={<div className="flex items-center justify-center h-64"><div className="text-[#8b949e]">Loading...</div></div>}>
+    <Suspense fallback={
+      <div className="max-w-5xl mx-auto">
+        <div className="mb-8">
+          <div className="h-7 w-24 bg-elevated rounded animate-pulse mb-2" />
+          <div className="h-4 w-64 bg-elevated rounded animate-pulse" />
+        </div>
+        <SkeletonSettings />
+      </div>
+    }>
       <SettingsContent />
     </Suspense>
   )

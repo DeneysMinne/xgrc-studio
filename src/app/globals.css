@@ -1,26 +1,125 @@
 @import "tailwindcss";
 
+/* ── Design Tokens ───────────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Dark (default) */
+  --bg-base:        #0d1117;
+  --bg-surface:     #161b22;
+  --bg-elevated:    #21262d;
+  --bg-sidebar:     #0a1628;
+  --border:         #30363d;
+  --border-subtle:  #1e2a3a;
+  --text-primary:   #e6edf3;
+  --text-secondary: #8b949e;
+  --accent:         #0066ff;
+  --accent-glow:    #00d4ff;
+  --ok:             #3fb950;
+  --err:            #f85149;
+  --warn:           #d29922;
 }
 
+html.light {
+  --bg-base:        #f6f8fa;
+  --bg-surface:     #ffffff;
+  --bg-elevated:    #eaeef2;
+  --bg-sidebar:     #ffffff;
+  --border:         #d0d7de;
+  --border-subtle:  #e1e4e8;
+  --text-primary:   #0d1117;
+  --text-secondary: #57606a;
+  --accent:         #0055dd;
+  --accent-glow:    #0044bb;
+  --ok:             #1a7f37;
+  --err:            #cf222e;
+  --warn:           #9a6700;
+}
+
+/* ── Tailwind Token Map ───────────────────────────────────────── */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-base:     var(--bg-base);
+  --color-surface:  var(--bg-surface);
+  --color-elevated: var(--bg-elevated);
+  --color-sidebar:  var(--bg-sidebar);
+  --color-edge:     var(--border);
+  --color-faint:    var(--border-subtle);
+  --color-ink:      var(--text-primary);
+  --color-dim:      var(--text-secondary);
+  --color-accent:   var(--accent);
+  --color-glow:     var(--accent-glow);
+  --color-ok:       var(--ok);
+  --color-err:      var(--err);
+  --color-warn:     var(--warn);
+  --font-sans:      var(--font-geist-sans);
+  --font-mono:      var(--font-geist-mono);
+  --radius-sm:      4px;
+  --radius-md:      8px;
+  --radius-lg:      12px;
+  --radius-xl:      16px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ── Base ─────────────────────────────────────────────────────── */
+@layer base {
+  body {
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    font-family: Inter, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Global focus ring — every interactive element */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
+}
+
+/* ── Component Utilities ──────────────────────────────────────── */
+@layer components {
+  .field {
+    @apply bg-base border border-edge rounded-md px-3 py-2 text-ink text-sm transition-colors;
+    @apply focus:outline-none focus:border-accent;
+  }
+
+  .card {
+    @apply bg-surface border border-edge rounded-lg;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 bg-accent text-white rounded-lg
+           text-sm font-medium transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 bg-elevated border border-edge
+           text-ink rounded-lg text-sm font-medium transition-all hover:border-accent;
+  }
+
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 bg-err/20 text-err
+           border border-err/30 rounded-lg text-sm font-medium transition-all hover:bg-err/30;
+  }
+
+  .label {
+    @apply block text-sm font-medium text-ink mb-1.5;
+  }
+
+  .helper {
+    @apply text-xs text-dim mt-1;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ── Motion: respect prefers-reduced-motion ───────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
