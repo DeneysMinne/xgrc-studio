@@ -247,12 +247,17 @@ export function selectBestVariant(
 ): LogoVariant | null {
   const logo = brandData.logos.find(l => l.key === logoKey)
   if (!logo) return null
-  const darkKeywords = ['dark','navy','charcoal','night','black','deep','midnight','shadow']
-  const lightKeywords = ['white','light','bright','clean','minimal','grey','silver','soft']
+  // XGRC brand is almost exclusively dark-background. Only override to 'light'
+  // when the concept explicitly describes a white/light background.
+  // Avoid false positives from words like "clean", "minimal", "grey" which
+  // describe style, not background colour.
+  const darkKeywords = ['dark','navy','charcoal','night','black','deep','midnight','shadow','teal','gradient','digital','cyber','blue','green','glow','neon']
+  const lightKeywords = ['white background','light background','bright white','clean white','light grey background']
   const conceptLower = visualConcept.toLowerCase()
   const isDark = darkKeywords.some(k => conceptLower.includes(k))
   const isLight = lightKeywords.some(k => conceptLower.includes(k))
-  const bgType = isDark ? 'dark' : isLight ? 'light' : 'dark'
+  // Default to dark — correct for ~95% of XGRC content
+  const bgType = isLight && !isDark ? 'light' : 'dark'
   const withPaths = logo.variants.filter(v => v.filePath)
   const exactMatch = withPaths.find(v => v.worksOn === bgType)
   const anyMatch = withPaths.find(v => v.worksOn === 'any')

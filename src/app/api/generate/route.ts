@@ -59,14 +59,17 @@ export async function POST(req: Request) {
               if (fullResponse.includes('---XGRC_META---')) {
                 streamingDone = true
               } else {
-                send('token', JSON.stringify({ text }))
+                // Strip markdown bold markers before streaming to UI
+                const cleanText = text.replace(/\*\*/g, '')
+                if (cleanText) send('token', JSON.stringify({ text: cleanText }))
               }
             }
           }
         }
 
         const meta = parseMeta(fullResponse)
-        const postText = fullResponse.split('---XGRC_META---')[0].trim()
+        // Strip markdown bold/italic markers — LinkedIn does not render markdown
+        const postText = fullResponse.split('---XGRC_META---')[0].trim().replace(/\*\*/g, '').replace(/\*([^*]+)\*/g, '$1')
         const variant = selectBestVariant(logoKey, meta.visualConcept, brandData)
         const logo = brandData.logos.find(l => l.key === logoKey) ?? null
         const imagePrompt = generateImagePrompt(body.topic, logo, variant, meta.visualConcept, meta.imageText)

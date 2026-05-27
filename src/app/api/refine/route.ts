@@ -19,6 +19,8 @@ export async function POST(req: Request) {
 
   try {
     const result = await refinePost(settings.anthropicApiKey, originalPost, heading, instructions, writerConfig)
+    // Strip markdown bold/italic that Claude occasionally outputs despite instructions
+    result.post = result.post.replace(/\*\*/g, '').replace(/\*([^*]+)\*/g, '$1')
     return NextResponse.json(result)
   } catch (error) {
     return NextResponse.json({ error: String(error) }, { status: 500 })
