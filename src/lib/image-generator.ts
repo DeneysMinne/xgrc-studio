@@ -48,7 +48,7 @@ async function compositeLogoOntoImage(
 
   // Logo width = 18% of image width, min 120px max 300px
   const logoWidth = Math.min(300, Math.max(120, Math.round(imageWidth * 0.18)))
-  const margin = Math.round(imageWidth * 0.04)
+  const margin = Math.round(imageWidth * 0.055)
 
   const gravity = resolvePlacement(logoOptions.placement)
 

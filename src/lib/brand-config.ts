@@ -266,29 +266,27 @@ export function generateImagePrompt(
   visualConcept: string,
   imageText: string
 ): string {
-  const logoInstruction = variant?.filePath
-    ? `Include the logo "${logo!.trademarkName}" from file: ${variant.filePath}. Placement: ${logo!.preferredPlacement}. Clear space: ${logo!.minClearSpace}. Do not recreate, distort, recolour, or modify the logo.`
-    : `Do not include any logo. Generate a clean branded visual without logo text.`
+  return `Create a premium LinkedIn banner image for XGRC Software. Dimensions: 1200 × 627 px.
 
-  return `Create a premium LinkedIn image for XGRC Software.
+CRITICAL LAYOUT RULE — READ FIRST:
+Mandatory safe zone: NO text or important visual element may appear within 80px of ANY edge (left, right, top, or bottom). Every element must be fully visible and completely unclipped. Treat the outer 80px on all sides as background bleed only — no content there.
+
+DO NOT include any logo, wordmark, brand name, or company name text in the image. The logo will be added separately. Leave the bottom-right corner clear.
 
 Topic: ${topic}
 Visual concept: ${visualConcept}
 
-Brand: XGRC Software — Driving Compliance®
-Colours: Deep navy (#0a1628), charcoal grey (#1e2a3a), white, electric blue (#0066ff), cyan (#00d4ff)
+Brand colours: Deep navy (#0a1628), charcoal grey (#1e2a3a), white, electric blue (#0066ff), cyan (#00d4ff)
 Style: Premium B2B SaaS. Modern enterprise technology. Clean 3D or polished vector. Professional, secure, sophisticated.
 
-Logo: ${logoInstruction}
+Text on image: ${imageText ? `Include only "${imageText}" — large bold type, fully inside the safe zone, no cropping, no other text.` : 'Minimal text only. Use 2–4 words max if it adds clarity. Must be inside the safe zone.'}
 
-Text on image: ${imageText ? `Include "${imageText}" — max 4 words, large and legible.` : 'Minimal text. Use topic title (2–4 words) if it improves the design.'}
-
-Requirements:
+Visual requirements:
 - Meaningful governance/risk/compliance/cybersecurity/ESG visual metaphors
 - Premium enterprise aesthetic — no cartoon, no stock photos, no clutter
-- Safe margins around all elements
+- All elements completely visible and inside the safe zone
 
-Negative: No cartoon. No stock-photo people. No fake logos. No blurry graphics. No cluttered layout. No excessive text.
+Negative: No logo. No wordmark. No "XGRC". No company name. No cartoon. No stock-photo people. No blurry graphics. No element touching or crossing any edge.
 
 Format: 1200 × 627 px, high quality.`
 }
