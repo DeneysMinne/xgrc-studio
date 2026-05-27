@@ -115,7 +115,7 @@ async function compositeTextOnImage(imageBuffer: Buffer, text: string): Promise<
     <text
       x="${marginX}"
       y="${textY}"
-      font-family="Arial, Helvetica, sans-serif"
+      font-family="Liberation Sans, Arial, Helvetica, sans-serif"
       font-weight="bold"
       font-size="${fontSize}"
       fill="white"
