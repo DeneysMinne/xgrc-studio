@@ -97,6 +97,7 @@ export default function StreamingEditor({ state, onUpdate, onNext }: Props) {
                 solutionName: state.solutionName,
                 logoKey: generationResult.logoKey,
                 visualConcept: generationResult.visualConcept,
+                imageText: generationResult.imageText,
               }),
             })
             const imgData = await imgRes.json()

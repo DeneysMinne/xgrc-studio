@@ -64,6 +64,7 @@ export default function ReviewEdit({ state, onUpdate, onBack, onNext }: Props) {
           solutionName: state.solutionName,
           logoKey: state.logoKey,
           visualConcept: state.visualConcept,
+          imageText: state.imageText,
         }),
       })
       const data = await res.json()

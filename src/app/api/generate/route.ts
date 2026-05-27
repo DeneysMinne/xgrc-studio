@@ -68,8 +68,10 @@ export async function POST(req: Request) {
         }
 
         const meta = parseMeta(fullResponse)
-        // Strip markdown bold/italic markers — LinkedIn does not render markdown
-        const postText = fullResponse.split('---XGRC_META---')[0].trim().replace(/\*\*/g, '').replace(/\*([^*]+)\*/g, '$1')
+        // Strip markdown bold/italic and em/en dashes — LinkedIn does not render markdown
+        const postText = fullResponse.split('---XGRC_META---')[0].trim()
+          .replace(/\*\*/g, '').replace(/\*([^*]+)\*/g, '$1')
+          .replace(/—/g, ' - ').replace(/–/g, ' - ')
         const variant = selectBestVariant(logoKey, meta.visualConcept, brandData)
         const logo = brandData.logos.find(l => l.key === logoKey) ?? null
         const imagePrompt = generateImagePrompt(body.topic, logo, variant, meta.visualConcept, meta.imageText)

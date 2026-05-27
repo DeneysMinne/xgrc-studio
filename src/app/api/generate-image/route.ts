@@ -5,7 +5,7 @@ import { selectLogoKey, selectBestVariant, DEFAULT_BRAND_CONFIG } from '@/lib/br
 import { BrandConfig } from '@/types'
 
 export async function POST(req: Request) {
-  const { prompt, postId, topic, solutionName, logoKey: providedLogoKey, visualConcept } = await req.json()
+  const { prompt, postId, topic, solutionName, logoKey: providedLogoKey, visualConcept, imageText } = await req.json()
   const settings = await prisma.settings.findUnique({ where: { id: 'singleton' } })
 
   if (!settings?.openaiApiKey) {
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const result = await generateImage(settings.openaiApiKey, prompt, postId, logoOptions)
+    const result = await generateImage(settings.openaiApiKey, prompt, postId, logoOptions, imageText)
     return NextResponse.json(result)
   } catch (error) {
     return NextResponse.json({ error: String(error) }, { status: 500 })

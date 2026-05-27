@@ -273,25 +273,24 @@ export function generateImagePrompt(
 ): string {
   return `Create a premium LinkedIn banner image for XGRC Software. Dimensions: 1200 × 627 px.
 
-CRITICAL LAYOUT RULE — READ FIRST:
-Mandatory safe zone: NO text or important visual element may appear within 80px of ANY edge (left, right, top, or bottom). Every element must be fully visible and completely unclipped. Treat the outer 80px on all sides as background bleed only — no content there.
-
-DO NOT include any logo, wordmark, brand name, or company name text in the image. The logo will be added separately. Leave the bottom-right corner clear.
-
 Topic: ${topic}
 Visual concept: ${visualConcept}
 
 Brand colours: Deep navy (#0a1628), charcoal grey (#1e2a3a), white, electric blue (#0066ff), cyan (#00d4ff)
 Style: Premium B2B SaaS. Modern enterprise technology. Clean 3D or polished vector. Professional, secure, sophisticated.
 
-Text on image: ${imageText ? `Include only "${imageText}" — large bold type, fully inside the safe zone, no cropping, no other text.` : 'Minimal text only. Use 2–4 words max if it adds clarity. Must be inside the safe zone.'}
+CRITICAL — NO TEXT, NO LOGOS:
+- Do NOT include any text, words, numbers, or labels anywhere in the image.
+- Do NOT include any logo, wordmark, brand mark, icon badge, or company name.
+- Pure visual art only — text and logos are composited programmatically after generation.
+- Leave the bottom-left and bottom-right corners unobstructed.
 
 Visual requirements:
 - Meaningful governance/risk/compliance/cybersecurity/ESG visual metaphors
 - Premium enterprise aesthetic — no cartoon, no stock photos, no clutter
-- All elements completely visible and inside the safe zone
+- Rich background imagery that fills the full canvas
 
-Negative: No logo. No wordmark. No "XGRC". No company name. No cartoon. No stock-photo people. No blurry graphics. No element touching or crossing any edge.
+Negative: No text. No words. No logo. No wordmark. No "XGRC". No company name. No cartoon. No stock-photo people.
 
 Format: 1200 × 627 px, high quality.`
 }

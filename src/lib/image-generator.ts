@@ -87,6 +87,48 @@ async function compositeLogoOntoImage(
   return result
 }
 
+function escapeXml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;')
+}
+
+async function compositeTextOnImage(imageBuffer: Buffer, text: string): Promise<Buffer> {
+  const meta = await sharp(imageBuffer).metadata()
+  const w = meta.width || 1024
+  const h = meta.height || 1024
+
+  const marginX = Math.round(w * 0.085)
+  const marginY = Math.round(h * 0.105)
+  const fontSize = Math.min(80, Math.max(44, Math.round(w * 0.056)))
+  const textY = h - marginY
+
+  const svg = `<svg width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="ts" x="-10%" y="-60%" width="120%" height="220%">
+        <feDropShadow dx="2" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.9"/>
+      </filter>
+    </defs>
+    <text
+      x="${marginX}"
+      y="${textY}"
+      font-family="Arial, Helvetica, sans-serif"
+      font-weight="bold"
+      font-size="${fontSize}"
+      fill="white"
+      filter="url(#ts)"
+    >${escapeXml(text)}</text>
+  </svg>`
+
+  return sharp(imageBuffer)
+    .composite([{ input: Buffer.from(svg), top: 0, left: 0 }])
+    .png({ compressionLevel: 8 })
+    .toBuffer()
+}
+
 // Strip C2PA/EXIF metadata that causes LinkedIn's AI-generated label
 async function stripMetadata(imageBuffer: Buffer): Promise<Buffer> {
   return sharp(imageBuffer)
@@ -100,7 +142,8 @@ export async function generateImage(
   apiKey: string,
   prompt: string,
   postId?: string,
-  logoOptions?: LogoCompositeOptions
+  logoOptions?: LogoCompositeOptions,
+  imageText?: string
 ): Promise<{ imagePath: string; warning?: string }> {
   const client = new OpenAI({ apiKey })
   const timestamp = Date.now()
@@ -157,6 +200,15 @@ export async function generateImage(
 
   // Strip AI metadata (removes C2PA content credentials → prevents LinkedIn AI label)
   imageBuffer = await stripMetadata(imageBuffer)
+
+  // Composite text overlay programmatically — more reliable than asking AI to render text
+  if (imageText?.trim()) {
+    try {
+      imageBuffer = await compositeTextOnImage(imageBuffer, imageText.trim())
+    } catch {
+      warning = (warning ? warning + '; ' : '') + 'Text compositing failed'
+    }
+  }
 
   // Composite logo onto image if a logo file path is provided
   if (logoOptions?.logoFilePath) {
